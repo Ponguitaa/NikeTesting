@@ -1,0 +1,60 @@
+# Node modules
+**/node_modules/
+node_modules/
+
+# Compiled output
+**/dist/
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+
+# Angular cache
+**/.angular/cache
+.angular/cache
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+
+# Cypress
+**/cypress/screenshots/
+**/cypress/videos/
+**/cypress/downloads/
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# IDE - JetBrains (WebStorm, IntelliJ, etc)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Eclipse
+.classpath
+.project
+.settings/
+
+# misc
+**/.sass-cache
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+.DS_Store
+Thumbs.db
+
+# System Files
+.DS_Store
+Thumbs.db

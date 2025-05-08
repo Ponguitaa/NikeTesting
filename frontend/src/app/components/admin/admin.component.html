@@ -1,0 +1,128 @@
+<div class="flex flex-col min-h-screen bg-black text-white">
+    <main class="flex-grow flex items-center justify-center">
+      <div class="w-full max-w-lg p-8 bg-black shadow-xl rounded-xl border border-white">
+        <!-- Success and Error Messages -->
+        <div *ngIf="successMessage" class="p-3 bg-green-600 text-white rounded-lg mb-4">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="p-3 bg-red-600 text-white rounded-lg mb-4">
+          {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          
+          <div>
+            <label for="name" class="block font-semibold mb-2 text-lg">Nombre del Producto:</label>
+            <input
+              id="name"
+              formControlName="name"
+              type="text"
+              required
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+            <div *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid" class="text-red-400 text-sm mt-2">
+              <small *ngIf="productForm.get('name')?.hasError('required')">El nombre es obligatorio.</small>
+            </div>
+          </div>
+
+          <div>
+            <label for="reference" class="block font-semibold mb-2 text-lg">Número de Referencia:</label>
+            <input
+              id="reference"
+              formControlName="reference"
+              type="text"
+              required
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+            <div *ngIf="productForm.get('reference')?.touched && productForm.get('reference')?.invalid" class="text-red-400 text-sm mt-2">
+              <small *ngIf="productForm.get('reference')?.hasError('required')">La referencia es obligatoria.</small>
+            </div>
+          </div>
+  
+          <div>
+            <label for="price" class="block font-semibold mb-2 text-lg">Precio:</label>
+            <input
+              id="price"
+              formControlName="price"
+              type="number"
+              required
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+            <div *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid" class="text-red-400 text-sm mt-2">
+              <small *ngIf="productForm.get('price')?.hasError('required')">El precio es obligatorio.</small>
+              <small *ngIf="productForm.get('price')?.hasError('min')">El precio debe ser mayor que 0.</small>
+              <small *ngIf="productForm.get('price')?.hasError('pattern')">El precio debe ser un número válido.</small>
+            </div>
+          </div>
+  
+          <div>
+            <label for="desc" class="block font-semibold mb-2 text-lg">Descripción:</label>
+            <input
+              id="desc"
+              formControlName="desc"
+              type="text"
+              required
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+            <div *ngIf="productForm.get('desc')?.touched && productForm.get('desc')?.invalid" class="text-red-400 text-sm mt-2">
+              <small *ngIf="productForm.get('desc')?.hasError('required')">La descripción es obligatoria.</small>
+            </div>
+          </div>
+
+          <div>
+            <label for="type" class="block font-semibold mb-2 text-lg">Tipo de Producto:</label>
+            <select
+              id="type"
+              formControlName="type"
+              required
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            >
+              <option value="">Seleccionar tipo</option>
+              <option value="running">Running</option>
+              <option value="casual">Casual</option>
+              <option value="basketball">Basketball</option>
+              <option value="football">Football</option>
+              <option value="tennis">Tennis</option>
+            </select>
+            <div *ngIf="productForm.get('type')?.touched && productForm.get('type')?.invalid" class="text-red-400 text-sm mt-2">
+              <small *ngIf="productForm.get('type')?.hasError('required')">El tipo es obligatorio.</small>
+            </div>
+          </div>
+  
+          <div>
+            <label for="image" class="block font-semibold mb-2 text-lg">Imagen del Producto:</label>
+            <input
+              id="image"
+              type="file"
+              (change)="onImageSelected($event)"
+              accept="image/*"
+              class="w-full p-3 border border-white rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+            <div *ngIf="!selectedImage && productForm.touched" class="text-yellow-400 text-sm mt-2">
+              <small>Se recomienda subir una imagen del producto.</small>
+            </div>
+          </div>
+  
+          <div class="flex items-center">
+            <label for="onSale" class="mr-2 text-lg">Producto en oferta:</label>
+            <input
+              id="onSale"
+              type="checkbox"
+              class="w-4 h-4 border border-white rounded-md bg-black focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+            />
+          </div>
+  
+          <div>
+            <button
+              type="submit"
+              [disabled]="productForm.invalid"
+              class="w-full p-3 rounded-lg cursor-pointer bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-semibold text-lg transition duration-300 ease-in-out"
+            >
+              Subir Producto
+            </button>
+          </div>
+          
+        </form>
+      </div>
+    </main>
+  </div>

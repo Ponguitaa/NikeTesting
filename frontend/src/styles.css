@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: 'HelveticaNowVar';
+    src: url('assets/HelveticaNowVar (2).ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+ 
+  * {
+    font-family: 'HelveticaNowVar', sans-serif;
+  }
