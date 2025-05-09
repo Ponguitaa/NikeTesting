@@ -7,6 +7,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { Component } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 
 // Unit Tests
 describe('AddProductService (Unit Tests)', () => {
@@ -145,8 +146,8 @@ describe('AddProductService (Unit Tests)', () => {
   });
 });
 
-// Integration Tests
-describe('AddProductService (Integration Tests)', () => {
+// Integration Tests con formularios y errores
+describe('AddProductService (Basic Integration Tests)', () => {
   let service: AddProductService;
   let httpClient: HttpClient;
   let formBuilder: FormBuilder;
@@ -304,79 +305,89 @@ describe('AddProductService (Integration Tests)', () => {
       expect(deleteSpy).toHaveBeenCalledWith('http://localhost:3000/api/products/REF-FLOW-123');
     });
   });
+});
 
-  // Integration with real components
-  describe('Integration with AdminComponent', () => {
-    let adminComponent: AdminComponent;
+// Pruebas separadas para la integración con AdminComponent
+describe('AdminComponent Integration with AddProductService', () => {
+  let adminComponent: AdminComponent;
+  let service: jasmine.SpyObj<AddProductService>;
+  let router: Router;
+
+  beforeEach(() => {
+    // Creamos un spy para el servicio
+    const serviceSpy = jasmine.createSpyObj('AddProductService', ['createProduct']);
     
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          ReactiveFormsModule,
-          RouterTestingModule
-        ],
-        providers: [
-          FormBuilder
-        ]
-      });
-      
-      // Create an instance of AdminComponent
-      adminComponent = new AdminComponent(service, TestBed.inject(FormBuilder));
+    // Configuramos TestBed para este bloque de pruebas específico
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [
+        ReactiveFormsModule,
+        RouterTestingModule
+      ],
+      providers: [
+        { provide: AddProductService, useValue: serviceSpy }
+      ]
     });
     
-    it('should correctly handle product creation through AdminComponent', () => {
-      // Spy on the service method
-      const serviceSpy = spyOn(service, 'createProduct').and.returnValue(
-        of({ mensaje: 'Producto agregado exitosamente', producto: { insertId: 888 } })
-      );
-      
-      // Set form values as a user would
-      adminComponent.productForm.setValue({
-        name: 'Integration Component Test',
-        price: '149.99',
-        desc: 'Testing with real component',
-        type: 'basketball',
-        reference: 'REF-COMP-123'
-      });
-      
-      // Simulate form submission
-      adminComponent.onSubmit();
-      
-      // Verify service was called with proper data
-      expect(serviceSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-        name: 'Integration Component Test',
-        price: 149.99,
-        description: 'Testing with real component',
-        type: 'basketball',
-        reference: 'REF-COMP-123'
-      }));
-      
-      // Verify component state changes
-      expect(adminComponent.successMessage).toContain('exitosamente');
-      expect(adminComponent.errorMessage).toBeNull();
+    router = TestBed.inject(Router);
+    service = TestBed.inject(AddProductService) as jasmine.SpyObj<AddProductService>;
+    
+    // Creamos una instancia del componente manualmente
+    adminComponent = new AdminComponent(service, router);
+  });
+  
+  it('should correctly handle product creation through AdminComponent', () => {
+    // Configuramos el spy para simular una respuesta exitosa
+    service.createProduct.and.returnValue(
+      of({ mensaje: 'Producto agregado exitosamente', producto: { insertId: 888 } })
+    );
+    
+    // Configuramos el formulario
+    adminComponent.productForm.setValue({
+      name: 'Integration Component Test',
+      price: '149.99',
+      desc: 'Testing with real component',
+      type: 'basketball',
+      reference: 'REF-COMP-123'
     });
     
-    it('should handle errors when product creation fails', () => {
-      // Spy on service to simulate error
-      spyOn(service, 'createProduct').and.returnValue(
-        throwError(() => new Error('Integration error test'))
-      );
-      
-      // Set form values
-      adminComponent.productForm.setValue({
-        name: 'Error Component Test',
-        price: '129.99',
-        desc: 'Error handling with real component',
-        type: 'football',
-        reference: 'REF-ERR-COMP'
-      });
-      
-      // Simulate form submission
-      adminComponent.onSubmit();
-      
-      // Verify component reflects error state
-      expect(adminComponent.errorMessage).toBeTruthy();
-      expect(adminComponent.successMessage).toBeNull();
+    // Simulamos el envío del formulario
+    adminComponent.onSubmit();
+    
+    // Verificamos que se llamó al servicio con los datos correctos
+    expect(service.createProduct).toHaveBeenCalledWith(jasmine.objectContaining({
+      name: 'Integration Component Test',
+      price: 149.99,
+      description: 'Testing with real component',
+      type: 'basketball',
+      reference: 'REF-COMP-123'
+    }));
+    
+    // Verificamos los cambios en el estado del componente
+    expect(adminComponent.successMessage).toContain('exitosamente');
+    expect(adminComponent.errorMessage).toBeNull();
+  });
+  
+  it('should handle errors when product creation fails', () => {
+    // Configuramos el spy para simular un error
+    service.createProduct.and.returnValue(
+      throwError(() => new Error('Integration error test'))
+    );
+    
+    // Configuramos el formulario
+    adminComponent.productForm.setValue({
+      name: 'Error Component Test',
+      price: '129.99',
+      desc: 'Error handling with real component',
+      type: 'football',
+      reference: 'REF-ERR-COMP'
     });
+    
+    // Simulamos el envío del formulario
+    adminComponent.onSubmit();
+    
+    // Verificamos que se reflejan los estados de error en el componente
+    expect(adminComponent.errorMessage).toBeTruthy();
+    expect(adminComponent.successMessage).toBeNull();
   });
 });

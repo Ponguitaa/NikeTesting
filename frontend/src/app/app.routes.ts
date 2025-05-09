@@ -4,9 +4,13 @@ import { LandingPageComponent } from "./components/landing-page/landing-page.com
 import { FooterComponent} from "./components/footer/footer.component";
 import { AdminComponent } from './components/admin/admin.component';
 import { ProductsComponent } from './components/products/products.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
 
 export const routes: Routes = [
     {path: '', component: LandingPageComponent},
     {path: 'admin', component: AdminComponent},
-    {path: 'products', component: ProductsComponent}
+    {path: 'products', component: ProductsComponent},
+    {path: 'login', component: LoginComponent},
+    {path: 'register', component: RegisterComponent}
 ];
