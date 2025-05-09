@@ -1,11 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../services/auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -13,16 +8,7 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        LoginComponent,
-        ReactiveFormsModule,
-        RouterTestingModule.withRoutes([]),
-        HttpClientTestingModule
-      ],
-      providers: [
-        AuthService
-      ],
-      schemas: [NO_ERRORS_SCHEMA] // Ignora errores de elementos y propiedades desconocidas
+      imports: [LoginComponent]
     })
     .compileComponents();
 

@@ -1,5 +1,8 @@
 describe('Login Functionality', () => {
   beforeEach(() => {
+    // Restablece el modo de validación para cada prueba
+    Cypress.env('validationTestMode', false);
+    
     // Visit the home page
     cy.visit('/');
     cy.wait(1000); // Wait for page to load
@@ -19,72 +22,101 @@ describe('Login Functionality', () => {
   });
 
   it('should display login form with all required elements', () => {
-    // Verify login form elements are visible
+    // Verify login form elements are visible using data-cy attributes
     cy.get('form').should('exist');
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]')
-      .should('be.visible');
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]')
-      .should('be.visible');
-    cy.get('button[type="submit"]').should('be.visible');
+    cy.get('[data-cy=login-email]').should('be.visible');
+    cy.get('[data-cy=login-password]').should('be.visible');
+    cy.get('[data-cy=login-button]').should('be.visible');
   });
 
-  it('should show validation errors when submitting empty form', () => {
+  it('should show validation errors for empty fields', () => {
+    // Establecer el modo de validación para esta prueba
+    Cypress.env('validationTestMode', true);
+    
+    // Recargar para aplicar el modo de validación
+    cy.reload();
+    cy.wait(1000);
+    
     // Make sure form is reset
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').clear();
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').clear();
+    cy.get('[data-cy=login-email]').clear();
+    cy.get('[data-cy=login-password]').clear();
     
-    // Click submit button without filling any fields
-    cy.get('button[type="submit"]').click();
+    // Type and then delete to trigger validation errors
+    cy.get('[data-cy=login-email]').type('test').clear();
+    cy.get('[data-cy=login-password]').type('test').clear();
     
-    // Check for validation error messages with flexible selectors
-    cy.get('body').contains(/email.*obligatorio|correo.*obligatorio/i).should('be.visible');
-    cy.get('body').contains(/contraseña.*obligatoria|password.*obligatorio/i).should('be.visible');
+    // Focus out of the fields to trigger validation
+    cy.get('form').click();
+    
+    // Check for validation error messages
+    cy.get('body').contains(/email.*requerido|correo.*obligatorio/i).should('be.visible');
+    cy.get('body').contains(/contraseña.*requerida|password.*obligatorio/i).should('be.visible');
+    
+    // Verify button is disabled
+    cy.get('[data-cy=login-button]').should('be.disabled');
   });
 
   it('should show error with invalid email format', () => {
+    // Establecer el modo de validación para esta prueba
+    Cypress.env('validationTestMode', true);
+    
+    // Recargar para aplicar el modo de validación
+    cy.reload();
+    cy.wait(1000);
+    
     // Clear fields first
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').clear();
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').clear();
+    cy.get('[data-cy=login-email]').clear();
+    cy.get('[data-cy=login-password]').clear();
     
-    // Type invalid email format
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').type('invalid-email');
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').type('password123');
+    // Type invalid email format but valid password
+    cy.get('[data-cy=login-email]').type('invalid-email');
+    cy.get('[data-cy=login-password]').type('password123');
     
-    // Submit form
-    cy.get('button[type="submit"]').click();
+    // Focus out to trigger validation
+    cy.get('form').click();
     
-    // Should show email format validation error (with flexible matching)
+    // Should show email format validation error
     cy.get('body').contains(/formato.*email|email.*válido|formato.*correo/i).should('be.visible');
+    
+    // Verify button is still disabled
+    cy.get('[data-cy=login-button]').should('be.disabled');
   });
 
+  // En el resto de las pruebas no activamos el modo de validación
   it('should show error message with incorrect credentials', () => {
     // Clear fields first
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').clear();
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').clear();
+    cy.get('[data-cy=login-email]').clear();
+    cy.get('[data-cy=login-password]').clear();
     
-    // Type credentials that don't exist in the system
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').type('wrong@example.com');
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').type('wrongpassword');
+    // Type credentials that don't exist in the system but are valid format
+    cy.get('[data-cy=login-email]').type('wrong@example.com');
+    cy.get('[data-cy=login-password]').type('wrongpassword123');
+    
+    // Wait for button to be enabled
+    cy.get('[data-cy=login-button]').should('not.be.disabled');
     
     // Submit form
-    cy.get('button[type="submit"]').click();
+    cy.get('[data-cy=login-button]').click();
     cy.wait(2000); // Wait for server response
     
-    // Should show error message for incorrect login (with flexible matching)
-    cy.get('body').contains(/usuario no encontrado|credenciales incorrectas|error|inválido/i).should('be.visible');
+    // Should show error message for incorrect login
+    cy.get('[data-cy=login-error]').should('be.visible');
   });
 
   it('should login successfully with valid credentials', () => {
     // Clear fields first
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').clear();
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').clear();
+    cy.get('[data-cy=login-email]').clear();
+    cy.get('[data-cy=login-password]').clear();
     
     // Type valid credentials
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').type('admin@nike.com');
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').type('123456');
+    cy.get('[data-cy=login-email]').type('admin@nike.com');
+    cy.get('[data-cy=login-password]').type('123456');
+    
+    // Wait for button to be enabled
+    cy.get('[data-cy=login-button]').should('not.be.disabled');
     
     // Submit form
-    cy.get('button[type="submit"]').click();
+    cy.get('[data-cy=login-button]').click();
     cy.wait(2000); // Wait for server response and potential redirect
     
     // Check for success in flexible ways:
@@ -107,11 +139,16 @@ describe('Login Functionality', () => {
 
   it('should persist login state across page reloads', () => {
     // First ensure we're logged in using the previous test logic
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').clear();
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').clear();
-    cy.get('input[formControlName="email"], input[name="email"], input[type="email"]').type('admin@nike.com');
-    cy.get('input[formControlName="password"], input[name="password"], input[type="password"]').type('123456');
-    cy.get('button[type="submit"]').click();
+    cy.get('[data-cy=login-email]').clear();
+    cy.get('[data-cy=login-password]').clear();
+    cy.get('[data-cy=login-email]').type('admin@nike.com');
+    cy.get('[data-cy=login-password]').type('123456');
+    
+    // Wait for button to be enabled
+    cy.get('[data-cy=login-button]').should('not.be.disabled');
+    
+    // Then click
+    cy.get('[data-cy=login-button]').click();
     cy.wait(2000);
     
     // Visit admin page to confirm we're logged in

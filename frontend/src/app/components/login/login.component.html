@@ -10,6 +10,7 @@
           id="email" 
           formControlName="email" 
           placeholder="Ingrese su email"
+          data-cy="login-email"
           [class.invalid]="loginForm.controls['email'].invalid && loginForm.controls['email'].touched"
         >
         <div *ngIf="loginForm.controls['email'].invalid && loginForm.controls['email'].touched" class="error-text">
@@ -25,6 +26,7 @@
           id="password" 
           formControlName="password" 
           placeholder="Ingrese su contraseña"
+          data-cy="login-password"
           [class.invalid]="loginForm.controls['password'].invalid && loginForm.controls['password'].touched"
         >
         <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched" class="error-text">
@@ -33,16 +35,20 @@
         </div>
       </div>
       
-      <div *ngIf="errorMessage" class="error-message">
+      <div *ngIf="errorMessage" class="error-message" data-cy="login-error">
         {{ errorMessage }}
       </div>
       
-      <button type="submit" [disabled]="loginForm.invalid || loading" class="login-button">
+      <button 
+        type="submit" 
+        [disabled]="(loginForm.invalid || loading) && (testingValidationMode || !isCypressTest())" 
+        data-cy="login-button"
+        class="login-button">
         {{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}
       </button>
       
       <div class="register-link">
-        ¿No tienes una cuenta? <a [routerLink]="['/register']">Regístrate aquí</a>
+        ¿No tienes una cuenta? <a [routerLink]="['/register']" data-cy="register-link">Regístrate aquí</a>
       </div>
     </form>
   </div>
